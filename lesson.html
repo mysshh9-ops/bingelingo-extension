@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BingeLingo Offline Lesson Generator</title>
+    <link rel="stylesheet" href="lesson.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BingeLingo Micro-Lesson Generator</h1>
+            <p>Offline-First Korean Learning Companion (Demo / Fallback Mode)</p>
+        </header>
+
+        <div id="status-message" class="message hidden"></div>
+
+        <!-- Step 1: Import Session JSON -->
+        <div id="import-card" class="card">
+            <h2>1. Import Session Subtitle JSON</h2>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">
+                Upload a session JSON file exported from your BingeLingo Chrome extension.
+            </p>
+            <div class="file-drop-zone" onclick="document.getElementById('json-file-input').click()">
+                <p style="margin: 0; font-weight: 600; color: #334155;">Click to select or drop exported JSON file</p>
+                <p style="margin: 5px 0 0; font-size: 12px; color: #94a3b8;">Supports BingeLingo session export format (*.json)</p>
+            </div>
+            <input type="file" id="json-file-input" accept=".json" class="hidden">
+        </div>
+
+        <!-- Step 2: Line Selection Card -->
+        <div id="selection-card" class="card hidden">
+            <h2>2. Select Dialogue Lines for Lesson</h2>
+            <p id="video-meta" style="font-size: 13px; font-weight: 600; color: #1e293b; margin-bottom: 10px;"></p>
+            <div style="margin-bottom: 10px; display: flex; gap: 10px;">
+                <button id="select-all-btn" class="btn secondary" style="padding: 6px 12px; font-size: 12px;">Select All</button>
+                <button id="deselect-all-btn" class="btn secondary" style="padding: 6px 12px; font-size: 12px;">Deselect All</button>
+            </div>
+            <div id="lines-list" class="lines-container"></div>
+            <button id="generate-lesson-btn" class="btn" style="margin-top: 10px;">Generate Micro-Lesson</button>
+        </div>
+
+        <!-- Step 3: Generated Lesson View -->
+        <div id="lesson-card" class="card hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 15px;">
+                <h2 id="lesson-title" style="margin: 0;">Korean Micro-Lesson</h2>
+                <span class="badge demo">Offline Demo Mode</span>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 15px; color: #334155; margin-bottom: 8px;">Selected Dialogue Lines</h3>
+                <div id="lesson-lines-display" style="background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.5;"></div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 15px; color: #334155; margin-bottom: 8px;">Vocabulary & Romanization</h3>
+                <table class="vocab-table">
+                    <thead>
+                        <tr>
+                            <th>Korean Phrase</th>
+                            <th>Romanization</th>
+                            <th>English Meaning (Fallback)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vocab-tbody"></tbody>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 15px; color: #334155; margin-bottom: 8px;">Contextual Notes & Grammar</h3>
+                <div id="contextual-notes" style="background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; line-height: 1.5; color: #475569;"></div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 15px; color: #334155; margin-bottom: 15px;">Practice Quiz (5 Questions)</h3>
+                <div id="quiz-container"></div>
+                <button id="submit-quiz-btn" class="btn" style="margin-top: 15px;">Check Quiz Answers</button>
+            </div>
+
+            <div id="quiz-results" class="hidden" style="margin-top: 20px; padding: 15px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;">
+                <h3 style="margin-top: 0; color: #166534; font-size: 16px;" id="quiz-score-title">Quiz Results</h3>
+                <p id="quiz-feedback" style="font-size: 13px; color: #15803d; margin-bottom: 15px;"></p>
+                <button id="retry-quiz-btn" class="btn secondary">Retry Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="lesson.js"></script>
+</body>
+</html>

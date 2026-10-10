@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "BingeLingo Subtitle Capture",
+  "version": "1.0.1",
+  "description": "Capture inline Korean YouTube subtitles for BingeLingo language lessons.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "BingeLingo Capture"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "https://*.supabase.co/*"
+  ]
+}

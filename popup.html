@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>BingeLingo Capture</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="header">
+        <h1>BingeLingo</h1>
+        <p>Subtitle Capture Tool</p>
+    </div>
+    
+    <div class="content">
+        <div class="info-group">
+            <label>Current Video:</label>
+            <div id="video-title" class="truncate">No video capturing...</div>
+        </div>
+        
+        <div class="info-group">
+            <div id="capture-status">Status: ■ Idle</div>
+        </div>
+        
+        <div class="info-group">
+            <div id="lines-captured">Korean Lines Extracted: 0</div>
+            <div id="capture-stats" class="stats-detail" style="display: none;"></div>
+        </div>
+
+        <div id="message-box" class="message-box" style="display: none;"></div>
+
+        <div class="actions">
+            <button id="start-btn" class="btn primary">Start Capture</button>
+            <button id="stop-btn" class="btn secondary" disabled>Stop & Generate Lesson</button>
+            <button id="export-btn" class="btn outline" disabled>Export Session JSON</button>
+            <button id="open-lesson-builder-btn" class="btn outline">Open Offline Lesson Builder</button>
+        </div>
+        
+        <div class="hints">
+            Ensure YouTube video is open, and Captions (CC) are enabled & set to Korean. Auto-captions may vary.
+        </div>
+    </div>
+    <script type="module" src="popup.js"></script>
+</body>
+</html>
