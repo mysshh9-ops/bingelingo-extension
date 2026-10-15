@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const startBtn = document.getElementById('start-btn');
     const stopBtn = document.getElementById('stop-btn');
     const exportBtn = document.getElementById('export-btn');
+    const sendBingeLingoBtn = document.getElementById('send-bingelingo-btn');
     const openLessonBtn = document.getElementById('open-lesson-builder-btn');
     
     function showMessage(text, type = "info") {
@@ -65,6 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 startBtn.disabled = true;
                 stopBtn.disabled = false;
                 exportBtn.disabled = count === 0;
+                sendBingeLingoBtn.disabled = count === 0;
                 
                 if (session.warning && !currentMessage) {
                     showMessage(session.warning, "warning");
@@ -88,6 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 startBtn.disabled = false;
                 stopBtn.disabled = false;
                 exportBtn.disabled = false;
+                sendBingeLingoBtn.disabled = false;
             } else {
                 titleEl.textContent = "No active capture";
                 statusEl.textContent = "Status: ■ Idle";
@@ -98,6 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 startBtn.disabled = false;
                 stopBtn.disabled = true;
                 exportBtn.disabled = true;
+                sendBingeLingoBtn.disabled = true;
             }
         });
     }
@@ -284,6 +288,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (err) {
             console.error("[BingeLingo] Export error:", err);
             showMessage("Failed to export JSON: " + err.message, "error");
+        }
+    });
+
+    // Send captured Korean subtitles to the BingeLingo web app.
+    sendBingeLingoBtn.addEventListener('click', async () => {
+        if (isProcessing) return;
+        const originalLabel = sendBingeLingoBtn.textContent;
+        sendBingeLingoBtn.disabled = true;
+        sendBingeLingoBtn.textContent = 'Opening BingeLingo...';
+        try {
+            const { session } = await chrome.storage.local.get(['session']);
+            if (!session || !Array.isArray(session.lines) || session.lines.length === 0) {
+                showMessage('Capture some Korean dialogue first, then send it to BingeLingo.', 'warning');
+                return;
+            }
+            const payload = {
+                title: session.title || 'Korean subtitle session',
+                sourceUrl: session.url || '',
+                language: 'ko',
+                lines: session.lines.slice(0, 10).map(line => ({
+                    text: String(line.text || line.korean || '').trim(),
+                    timestamp: Number.isFinite(Number(line.timestamp)) ? Number(line.timestamp) : 0
+                })).filter(line => line.text)
+            };
+            if (!payload.lines.length) {
+                showMessage('No readable Korean dialogue lines were found in this session.', 'warning');
+                return;
+            }
+            const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+            const targetUrl = 'https://bingelingo.hatchable.site/?capture=' + encodeURIComponent(encoded);
+            if (targetUrl.length > 7000) {
+                showMessage('This session is too large to send in one link. Export the JSON instead.', 'warning');
+                return;
+            }
+            await chrome.tabs.create({ url: targetUrl });
+            showMessage('Opened BingeLingo with ' + payload.lines.length + ' captured lines.', 'success');
+        } catch (err) {
+            console.error('[BingeLingo] Send-to-app error:', err);
+            showMessage('Could not open BingeLingo: ' + err.message, 'error');
+        } finally {
+            sendBingeLingoBtn.textContent = originalLabel;
+            renderStateFeedback();
         }
     });
 
