@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const messageEl = document.getElementById('message-box');
     const startBtn = document.getElementById('start-btn');
     const stopBtn = document.getElementById('stop-btn');
+    const stopCaptureBtn = document.getElementById('stop-capture-btn');
+    const refreshBtn = document.getElementById('refresh-btn');
     const exportBtn = document.getElementById('export-btn');
     const sendBingeLingoBtn = document.getElementById('send-bingelingo-btn');
     const openLessonBtn = document.getElementById('open-lesson-builder-btn');
@@ -65,6 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 startBtn.disabled = true;
                 stopBtn.disabled = false;
+                stopCaptureBtn.disabled = false;
                 exportBtn.disabled = count === 0;
                 sendBingeLingoBtn.disabled = count === 0;
                 
@@ -88,7 +91,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 
                 startBtn.disabled = false;
-                stopBtn.disabled = false;
+                stopBtn.disabled = true;
+                stopCaptureBtn.disabled = true;
                 exportBtn.disabled = false;
                 sendBingeLingoBtn.disabled = false;
             } else {
@@ -100,6 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 startBtn.disabled = false;
                 stopBtn.disabled = true;
+                stopCaptureBtn.disabled = true;
                 exportBtn.disabled = true;
                 sendBingeLingoBtn.disabled = true;
             }
@@ -114,6 +119,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (area === 'local' && changes.session) {
             renderStateFeedback();
         }
+    });
+
+    // Stop capture immediately while preserving already collected lines.
+    stopCaptureBtn.addEventListener('click', async () => {
+        try {
+            const { session } = await chrome.storage.local.get(['session']);
+            if (!session || session.status !== 'capturing') {
+                showMessage('No active capture to stop.', 'info');
+                renderStateFeedback();
+                return;
+            }
+            await chrome.storage.local.set({ session: { ...session, status: 'idle', captureEndedAt: new Date().toISOString() } });
+            showMessage('Capture stopped. Your lines are saved; you can start again anytime.', 'success');
+            renderStateFeedback();
+        } catch (err) {
+            showMessage('Could not stop capture: ' + err.message, 'error');
+        }
+    });
+
+    // Refresh the popup's displayed capture state from saved extension storage.
+    refreshBtn.addEventListener('click', () => {
+        showMessage('Status refreshed.', 'info');
+        renderStateFeedback();
     });
 
     // Start Capture Button
